@@ -1,0 +1,58 @@
+seed: 42
+
+dataset:
+  dataset_name: modelset
+  params:
+    min_enr: 1.2
+    min_edges: 10
+    reload: false
+  max_graphs: 50
+
+masking:
+  enabled: true
+  ratio: 0.2
+  seed: 42
+  reset_existing: true
+
+metadata:
+  cls: abstract
+  label: name
+  attributes: attributes
+
+text_build:
+  include_node_label: true
+  include_node_type: false
+  include_node_attributes: true
+  include_edge_label: true
+  include_edge_type: true
+  path_depth: 1
+  max_paths_per_node: 64
+
+text_experiment:
+  encoder_name: tfidf
+  classifier_name: logreg
+
+gnn:
+  model_name: gcn
+  hidden_dim: 128
+  num_layers: 2
+  dropout: 0.3
+  learning_rate: 0.001
+  weight_decay: 0.0005
+  epochs: 30
+
+tree:
+  model_token: MODEL
+  object_token: OBJ
+  atts_token: ATTS
+  assoc_token: ASSOC
+  include_associations: true
+
+runs:
+  - name: tree_text_node
+    pipeline: tree_text_node
+    node_encoder_name: tfidf
+
+  - name: tree_gnn_node
+    pipeline: tree_gnn_node
+    node_encoder_name: tfidf

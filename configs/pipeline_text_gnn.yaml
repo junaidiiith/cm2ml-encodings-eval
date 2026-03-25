@@ -1,0 +1,95 @@
+seed: 42
+
+dataset:
+  dataset_name: modelset
+  params:
+    min_enr: 1.2
+    min_edges: 10
+    reload: false
+  max_graphs: 200
+
+masking:
+  enabled: true
+  ratio: 0.2
+  seed: 42
+  reset_existing: true
+
+metadata:
+  cls: abstract
+  label: name
+  attributes: attributes
+
+split:
+  test_ratio: 0.2
+  random_state: 42
+  stratify: true
+
+text_build:
+  include_node_label: true
+  include_node_type: false
+  include_node_attributes: true
+  include_edge_label: true
+  include_edge_type: true
+  path_depth: 1
+  max_paths_per_node: 64
+
+text_experiment:
+  encoder_name: tfidf
+  classifier_name: logreg
+
+bert:
+  model_name: bert-base-uncased
+  batch_size: 8
+  epochs: 3
+  learning_rate: 2.0e-5
+  max_length: 256
+  weight_decay: 0.01
+
+gnn:
+  model_name: gcn
+  hidden_dim: 128
+  num_layers: 2
+  dropout: 0.3
+  learning_rate: 0.001
+  weight_decay: 0.0005
+  epochs: 30
+
+runs:
+  # - name: text_node_tfidf_logreg
+  #   pipeline: text_node
+  #   text_experiment:
+  #     encoder_name: tfidf
+  #     classifier_name: logreg
+
+  # - name: text_node_bow_svm
+  #   pipeline: text_node
+  #   text_experiment:
+  #     encoder_name: bow
+  #     classifier_name: linearsvm
+
+  # - name: text_node_custom_w2v_logreg
+  #   pipeline: text_node
+  #   text_experiment:
+  #     encoder_name: custom_w2v
+  #     classifier_name: logreg
+
+  # - name: gnn_node_gcn_tfidf
+  #   pipeline: gnn_node
+  #   node_encoder_name: tfidf
+  #   gnn:
+  #     model_name: gcn
+  #     epochs: 30
+
+  - name: gnn_node_custom_w2v_gcn
+    pipeline: gnn_node
+    node_encoder_name: custom_w2v
+    gnn:
+      model_name: gcn
+      epochs: 30
+
+  # - name: gnn_node_gat_tfidf
+  #   pipeline: gnn_node
+  #   node_encoder_name: tfidf
+  #   gnn:
+  #     model_name: gat
+  #     epochs: 30
