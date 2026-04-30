@@ -210,7 +210,7 @@ __marimo__/
 datasets
 
 corpus_pickles*
-results*
+all_results*
 out*
 
 .vscode/
