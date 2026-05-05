@@ -8,7 +8,7 @@ import statistics
 from collections import defaultdict
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Dict, Iterable, List, Sequence
+from typing import Any, Dict, Sequence
 
 
 METRICS = ["accuracy", "precision_macro", "recall_macro", "f1_macro"]
@@ -47,9 +47,9 @@ FACTOR_LABELS = {
     "gnn_model_name": "GNN model",
 }
 DATASET_FILES = {
-    "eamodelset_layer": Path("results/node_cls_grid_eamodelset_layer.jsonl"),
-    "eamodelset_type": Path("results/node_cls_grid_eamodelset_type.jsonl"),
-    "modelset_abstract": Path("results/node_cls_grid_modelset_abstract.jsonl"),
+    # "eamodelset_layer": Path("results/node_cls_grid_eamodelset_layer.jsonl"),
+    # "eamodelset_type": Path("results/node_cls_grid_eamodelset_type.jsonl"),
+    "modelset_abstract": Path("analyse-new-matched/modelset_abstract/node_cls_grid_modelset_abstract_flat.csv"),
 }
 BOOTSTRAP_SAMPLES = 2000
 BOOTSTRAP_SEED = 42
@@ -104,35 +104,69 @@ def graph_encoder_family(tree: bool, path_depth: int) -> str:
     return f"{prefix}_bop_d{path_depth}"
 
 
-def load_rows(dataset_key: str, jsonl_path: Path) -> tuple[list[ExperimentRow], dict[str, int], int]:
-    successful: list[dict[str, Any]] = []
-    duplicate_counter: dict[str, int] = defaultdict(int)
-    total_rows = 0
-    with jsonl_path.open("r", encoding="utf-8") as handle:
-        for raw_line in handle:
-            if not raw_line.strip():
-                continue
-            total_rows += 1
-            record = json.loads(raw_line)
-            if record.get("status") != "ok":
-                continue
-            config = dict(record["config"])
-            config["gnn_model_name"] = normalize_gnn_model_name(config)
-            config["path_depth"] = int(config.get("path_depth", 0))
-            config["tree"] = bool(config.get("tree", False))
-            config["encoder_key"] = config.get("encoder_key") or config.get("encoder_name")
-            config["graph_encoder_family"] = graph_encoder_family(config["tree"], config["path_depth"])
-            config["structural_encoding_label"] = structural_encoding_label(config["tree"], config["path_depth"])
-            signature = canonical_signature(config)
-            duplicate_counter[signature] += 1
-            successful.append(
-                {
-                    "signature": signature,
-                    "config": config,
-                    "metrics": dict(record["result"]["metrics"]),
-                    "result": dict(record["result"]),
-                }
-            )
+def load_rows(dataset_key: str, file_path: Path) -> tuple[list[ExperimentRow], dict[str, int], int]:
+    
+    def process_record(record: dict[str, Any]) -> dict[str, Any] | None:
+        config = dict(record["config"])
+        config["gnn_model_name"] = normalize_gnn_model_name(config)
+        config["path_depth"] = int(config.get("path_depth", 0))
+        config["tree"] = bool(config.get("tree", False))
+        config["encoder_key"] = config.get("encoder_key") or config.get("encoder_name")
+        config["graph_encoder_family"] = graph_encoder_family(config["tree"], config["path_depth"])
+        config["structural_encoding_label"] = structural_encoding_label(config["tree"], config["path_depth"])
+        signature = canonical_signature(config)
+        return {
+            "signature": signature,
+            "config": config,
+            "metrics": dict(record["result"]["metrics"]),
+            "result": dict(record["result"]),
+        }
+    
+    def process_csv(path: Path) -> tuple[list[dict[str, Any]], dict[str, int], int]:
+        successful = []
+        duplicate_counter = defaultdict(int)
+        total_rows = 0
+        with path.open("r", encoding="utf-8") as handle:
+            reader = csv.DictReader(handle)
+            for row in reader:
+                total_rows += 1
+                if row.get("status") != "ok":
+                    continue
+                record = process_record({'config': dict(row), 'result': {'metrics': {metric: float(row[metric]) for metric in METRICS}}})
+                if record is None:
+                    continue
+                duplicate_counter[record["signature"]] += 1
+                successful.append(record)
+        return successful, dict(duplicate_counter), total_rows
+    
+    def process_jsonl(path: Path) -> tuple[list[dict[str, Any]], dict[str, int], int]:
+        successful = []
+        duplicate_counter = defaultdict(int)
+        total_rows = 0
+        with path.open("r", encoding="utf-8") as handle:
+            for raw_line in handle:
+                if not raw_line.strip():
+                    continue
+                total_rows += 1
+                record = json.loads(raw_line)
+                if record.get("status") != "ok":
+                    continue
+                processed = process_record(record)
+                if processed is None:
+                    continue
+                duplicate_counter[processed["signature"]] += 1
+                successful.append(processed)
+        return successful, dict(duplicate_counter), total_rows
+    
+    if not file_path.exists():
+        raise FileNotFoundError(f"Results file for dataset '{dataset_key}' not found at path: {file_path}")
+    ## if filepath ends with .csv, read as CSV and convert to expected format
+    if file_path.suffix == ".csv":
+        successful, duplicate_counter, total_rows = process_csv(file_path)
+    elif file_path.suffix == ".jsonl":
+        successful, duplicate_counter, total_rows = process_jsonl(file_path)
+    else:
+        raise ValueError(f"Unsupported file format for dataset '{dataset_key}': {file_path.suffix}")
 
     deduped: dict[str, dict[str, Any]] = {}
     for row in successful:
@@ -714,8 +748,8 @@ def render_evaluation_results_tex(dataset_outputs: dict[str, dict[str, Any]]) ->
     return "\n".join(lines) + "\n"
 
 
-def analyse_dataset(dataset_key: str, jsonl_path: Path, out_root: Path) -> dict[str, Any]:
-    rows, duplicate_counter, total_rows = load_rows(dataset_key, jsonl_path)
+def analyse_dataset(dataset_key: str, file_path: Path, out_root: Path) -> dict[str, Any]:
+    rows, duplicate_counter, total_rows = load_rows(dataset_key, file_path)
     coverage = coverage_for_dataset(rows, total_rows, duplicate_counter)
     flat_rows = [row.to_flat_dict() for row in rows]
     factor_summaries = {
@@ -736,6 +770,8 @@ def analyse_dataset(dataset_key: str, jsonl_path: Path, out_root: Path) -> dict[
     graph_family_transitions = build_graph_encoder_transition_summary(rows)
 
     dataset_dir = out_root / dataset_key
+    print("Dataset dir:", dataset_dir)
+    
     write_csv(
         dataset_dir / "flat_results.csv",
         flat_rows,
