@@ -116,7 +116,6 @@ res_tree_gnn = run_tree_gnn_node_classification(
 
 - `logreg`
 - `linearsvm`
-- `bert_classifier` (fine-tune `AutoModelForSequenceClassification`)
 
 ## Supported GNN Models
 

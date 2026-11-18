@@ -1,4 +1,7 @@
-from dataclasses import dataclass
+from __future__ import annotations
+
+from dataclasses import dataclass, field
+from typing import Tuple
 
 
 @dataclass
@@ -10,10 +13,28 @@ class SplitConfig:
 
 @dataclass
 class MetaDataConfig:
+    """Which node/edge fields play which role.
+
+    cls        -- the node field being predicted (never emitted into text)
+    label      -- the node field used as the node's name
+    attributes -- the node field holding attributes / meta-properties
+    type       -- the node field holding the node's (metamodel) type
+    edge_label -- the edge field holding the edge's name
+    edge_type  -- the edge field holding the edge's type
+    leak_keys  -- attribute / meta-property names that reveal `cls`; they are
+                  removed from every node (e.g. ``isAbstract`` for UML
+                  abstractness). The node type is handled separately: it is
+                  always hidden for the classified node and for test nodes.
+    """
+
     cls: str = "abstract"
     label: str = "name"
     attributes: str = "attributes"
-    
+    type: str = "type"
+    edge_label: str = "name"
+    edge_type: str = "type"
+    leak_keys: Tuple[str, ...] = ()
+
 
 @dataclass
 class TextBuildConfig:
@@ -26,24 +47,14 @@ class TextBuildConfig:
     max_paths_per_node: int = 64
     
     is_tree: bool = False
-    
-    metadata = MetaDataConfig()
+
+    metadata: MetaDataConfig = field(default_factory=MetaDataConfig)
     
 
 @dataclass
 class TextExperimentConfig:
     encoder_name: str = "tfidf"
     classifier_name: str = "logreg"
-
-
-@dataclass
-class BertClassifierConfig:
-    model_name: str = "bert-base-uncased"
-    batch_size: int = 8
-    epochs: int = 3
-    learning_rate: float = 2e-5
-    max_length: int = 256
-    weight_decay: float = 0.01
 
 
 @dataclass
@@ -55,6 +66,13 @@ class GNNExperimentConfig:
     learning_rate: float = 1e-3
     weight_decay: float = 5e-4
     epochs: int = 200
+    # How graph edges feed message passing (PyG passes messages source -> target):
+    #   "directed"   -- along the original edges (graph default, as in the original runs)
+    #   "reverse"    -- against them; for trees this is bottom-up, so each OBJ node
+    #                   aggregates its own subtree (tree default)
+    #   "undirected" -- both ways, aggregated together (loses direction)
+    #   None         -- pick the default for the structure
+    edge_direction: str | None = None
 
 
 @dataclass

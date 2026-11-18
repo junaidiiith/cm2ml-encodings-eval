@@ -14,7 +14,6 @@ import yaml
 from data_loading.models_dataset import get_models_dataset
 
 from cm2ml_encodings_eval.config import (
-    BertClassifierConfig,
     GNNExperimentConfig,
     MetaDataConfig,
     SplitConfig,
@@ -57,10 +56,6 @@ def _build_split_cfg(cfg: Dict[str, Any] | None) -> SplitConfig:
 
 def _build_text_exp_cfg(cfg: Dict[str, Any] | None) -> TextExperimentConfig:
     return TextExperimentConfig(**(cfg or {}))
-
-
-def _build_bert_cfg(cfg: Dict[str, Any] | None) -> BertClassifierConfig:
-    return BertClassifierConfig(**(cfg or {}))
 
 
 def _build_gnn_cfg(cfg: Dict[str, Any] | None) -> GNNExperimentConfig:
@@ -159,7 +154,6 @@ def run_from_yaml(config_path: str | Path) -> Dict[str, Any]:
 
         text_cfg = _build_text_cfg(run.get("text_build", deepcopy(cfg.get("text_build", {}))), run.get("metadata", base_metadata_cfg))
         text_exp_cfg = _build_text_exp_cfg(run.get("text_experiment", deepcopy(cfg.get("text_experiment", {}))))
-        bert_cfg = _build_bert_cfg(run.get("bert", deepcopy(cfg.get("bert", {}))))
         gnn_cfg = _build_gnn_cfg(run.get("gnn", deepcopy(cfg.get("gnn", {}))))
         tree_cfg = _build_tree_cfg(run.get("tree", deepcopy(cfg.get("tree", {}))))
 
@@ -175,7 +169,6 @@ def run_from_yaml(config_path: str | Path) -> Dict[str, Any]:
                 run_graphs,
                 text_cfg=text_cfg,
                 exp_cfg=text_exp_cfg,
-                bert_cfg=bert_cfg,
             )
         elif pipeline_name == "text_edge":
             result = run_text_edge_classification(
@@ -183,7 +176,6 @@ def run_from_yaml(config_path: str | Path) -> Dict[str, Any]:
                 target_attr=run.get("target_attr", text_cfg.metadata.cls),
                 text_cfg=text_cfg,
                 exp_cfg=text_exp_cfg,
-                bert_cfg=bert_cfg,
             )
         elif pipeline_name == "gnn_node":
             result = run_gnn_node_classification(
@@ -210,7 +202,6 @@ def run_from_yaml(config_path: str | Path) -> Dict[str, Any]:
                 run_graphs,
                 text_cfg=text_cfg,
                 exp_cfg=text_exp_cfg,
-                bert_cfg=bert_cfg,
                 tree_cfg=tree_cfg,
             )
         elif pipeline_name == "tree_gnn_node":
