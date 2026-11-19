@@ -1,0 +1,31 @@
+\begin{table*}[t]
+\caption{Top five configurations per dataset ranked by macro-F1. ``n/a'' marks a text-configuration flag that is not part of the design for the dataset (Attr.\ and ELabel for EA, NType for Modelset) or that cannot change the input at the given depth (edge and neighbour flags at $d=0$, and at $d=1$ for tree + text classifier), and the GNN column for text-classifier runs.}
+\label{tab:top5}
+\small
+\begin{tabular}{llllrlllllrrrr}
+\toprule
+Dataset & Encoder & Cls. & Tree & $d$ & Attr. & EType & ELabel & NType & GNN & Accuracy & Precision$_M$ & Recall$_M$ & F1$_M$ \\
+\midrule
+\multicolumn{14}{l}{\textit{EA Type classification (63 classes)}} \\
+EA Type & BoW & Text & False & 1 & n/a & True & n/a & True & n/a & 0.6919 & 0.6599 & 0.5626 & 0.5962 \\
+EA Type & BoW & GNN & False & 1 & n/a & True & n/a & False & SAGE & 0.6716 & 0.7136 & 0.5406 & 0.5853 \\
+EA Type & BoW & GNN & False & 1 & n/a & True & n/a & True & SAGE & 0.6854 & 0.6397 & 0.5562 & 0.5838 \\
+EA Type & BoW & GNN & False & 2 & n/a & True & n/a & True & SAGE & 0.6980 & 0.6506 & 0.5491 & 0.5808 \\
+EA Type & BERT & Text & False & 1 & n/a & True & n/a & True & n/a & 0.6550 & 0.6690 & 0.5419 & 0.5801 \\
+\midrule
+\multicolumn{14}{l}{\textit{EA Layer classification (7 classes)}} \\
+EA Layer & BoW & GNN & False & 1 & n/a & True & n/a & True & SAGE & 0.8780 & 0.8550 & 0.8201 & 0.8361 \\
+EA Layer & BoW & GNN & False & 3 & n/a & True & n/a & True & SAGE & 0.8755 & 0.8663 & 0.7954 & 0.8270 \\
+EA Layer & BoW & GNN & False & 2 & n/a & True & n/a & False & SAGE & 0.8741 & 0.8665 & 0.7942 & 0.8265 \\
+EA Layer & BoW & GNN & False & 2 & n/a & True & n/a & True & SAGE & 0.8772 & 0.8544 & 0.8038 & 0.8250 \\
+EA Layer & BoW & GNN & False & 3 & n/a & True & n/a & False & SAGE & 0.8711 & 0.8678 & 0.7908 & 0.8248 \\
+\midrule
+\multicolumn{14}{l}{\textit{Modelset Abstract classification (2 classes)}} \\
+Modelset Abstract & BoW & GNN & False & 1 & False & True & True & n/a & SAGE & 0.9390 & 0.8837 & 0.8777 & 0.8807 \\
+Modelset Abstract & BoW & GNN & False & 1 & True & True & True & n/a & SAGE & 0.9377 & 0.8782 & 0.8806 & 0.8794 \\
+Modelset Abstract & BoW & GNN & False & 1 & False & True & False & n/a & SAGE & 0.9366 & 0.8727 & 0.8860 & 0.8792 \\
+Modelset Abstract & BoW & GNN & False & 1 & True & True & False & n/a & SAGE & 0.9353 & 0.8764 & 0.8705 & 0.8734 \\
+Modelset Abstract & W2V & GNN & False & 1 & False & True & False & n/a & SAGE & 0.9281 & 0.8471 & 0.9016 & 0.8709 \\
+\bottomrule
+\end{tabular}
+\end{table*}

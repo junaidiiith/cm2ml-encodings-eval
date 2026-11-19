@@ -1,0 +1,401 @@
+<title>Encoding Configuration Explorer</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&family=Space+Grotesk:wght@500;600&display=swap">
+<style>
+/* Layout: one working column; controls above the transition plot, evidence (top-5, factor charts) below. */
+:root {
+  --bg: #f6f7f9; --surface: #ffffff; --ink: #1d2a3f; --ink-2: #4a5872; --muted: #7b879b;
+  --line: #dde2ea; --grid: #eceff4; --accent: #2f6db5; --accent-soft: #e3ecf8;
+  --pos: #2a9d8f; --neg: #e76f51; --bar: #4f81a3; --edge: #b5bdca; --missing: #a9b1bf;
+  --f-display: "Space Grotesk", "Segoe UI", system-ui, sans-serif;
+  --f-body: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+  --f-mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #11161e; --surface: #182029; --ink: #e5eaf2; --ink-2: #b3bdcc; --muted: #8592a6;
+  --line: #2a3441; --grid: #222b36; --accent: #7fb0ec; --accent-soft: #1f3550;
+  --pos: #4cc0b0; --neg: #f08a6c; --bar: #77a6c8; --edge: #4a5566; --missing: #5d6878; color-scheme: dark; } }
+:root[data-theme="dark"] {
+  --bg: #11161e; --surface: #182029; --ink: #e5eaf2; --ink-2: #b3bdcc; --muted: #8592a6;
+  --line: #2a3441; --grid: #222b36; --accent: #7fb0ec; --accent-soft: #1f3550;
+  --pos: #4cc0b0; --neg: #f08a6c; --bar: #77a6c8; --edge: #4a5566; --missing: #5d6878; color-scheme: dark; }
+body { background: var(--bg); color: var(--ink); font-family: var(--f-body); font-size: 15px; line-height: 1.5; }
+.wrap { max-width: 1240px; margin: 0 auto; padding-block: 28px 64px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
+  display: grid; gap: 28px; }
+header { display: grid; gap: 6px; }
+h1 { font-family: var(--f-display); font-weight: 600; font-size: 1.75rem; margin: 0; text-wrap: balance; letter-spacing: -0.01em; }
+h2 { font-family: var(--f-display); font-weight: 600; font-size: 1.2rem; margin: 0; text-wrap: balance; }
+.lede { color: var(--ink-2); max-width: 72ch; margin: 0; }
+.eyebrow { font-size: 0.72rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+.tabs { display: flex; flex-wrap: wrap; gap: 6px; }
+.tab { font: 500 0.9rem var(--f-body); color: var(--ink-2); background: transparent; border: 1px solid var(--line);
+  border-radius: 999px; padding: 6px 14px; cursor: pointer; }
+.tab[aria-selected="true"] { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+.tab:focus-visible, .chip:focus-visible, button:focus-visible, input:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.tab .meta { font-family: var(--f-mono); font-size: 0.75rem; opacity: 0.75; margin-left: 6px; }
+.panel { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 18px; display: grid; gap: 16px; min-width: 0; }
+.controls { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px 18px; }
+.ctrl { display: grid; gap: 6px; align-content: start; min-width: 0; }
+.ctrl-head { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+.ctrl-head .eyebrow { color: var(--ink-2); }
+.ctrl-head button { font: 500 0.72rem var(--f-body); color: var(--accent); background: none; border: 0; padding: 0; cursor: pointer; }
+.chips { display: flex; flex-wrap: wrap; gap: 5px; }
+.chip { font: 500 0.82rem var(--f-mono); color: var(--ink-2); background: var(--surface); border: 1px solid var(--line);
+  border-radius: 6px; padding: 4px 9px; cursor: pointer; position: relative; }
+.chip[aria-pressed="true"] { background: var(--accent-soft); border-color: var(--accent); color: var(--ink); }
+.chip.default::after { content: ""; position: absolute; top: 3px; right: 3px; width: 5px; height: 5px; border-radius: 50%; background: var(--accent); }
+.toolbar { display: flex; flex-wrap: wrap; gap: 10px 22px; align-items: center; font-size: 0.85rem; color: var(--ink-2); }
+.toolbar label { display: inline-flex; align-items: center; gap: 8px; }
+.toolbar input[type=range] { width: 140px; accent-color: var(--accent); }
+.toolbar .note { margin-left: auto; font-family: var(--f-mono); font-size: 0.78rem; color: var(--muted); }
+.legend-dot { display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: var(--accent); margin-right: 4px; vertical-align: 1px; }
+#plot { width: 100%; min-width: 0; }
+.summary { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; }
+.stat { border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px; display: grid; gap: 2px; min-width: 0; }
+.stat .v { font: 600 1.35rem var(--f-display); font-variant-numeric: tabular-nums; }
+.stat .k { font-size: 0.8rem; color: var(--ink-2); overflow-wrap: anywhere; }
+.scroll { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; font-size: 0.85rem; font-variant-numeric: tabular-nums; }
+th, td { text-align: left; padding: 6px 10px; border-bottom: 1px solid var(--line); white-space: nowrap; }
+th { font-size: 0.72rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+td.num, th.num { text-align: right; font-family: var(--f-mono); }
+td.na { color: var(--muted); }
+tr.best td.num:last-child { font-weight: 600; }
+.charts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px 20px; }
+@media (max-width: 760px) { .charts { grid-template-columns: minmax(0, 1fr); } }
+.chart { min-width: 0; }
+.fine { font-size: 0.82rem; color: var(--ink-2); max-width: 90ch; margin: 0; }
+.fine code, .mono { font-family: var(--f-mono); font-size: 0.8rem; }
+.pending { border: 1px dashed var(--line); border-radius: 10px; padding: 22px; color: var(--ink-2); }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+
+<div class="wrap">
+  <header>
+    <span class="eyebrow">Node classification · reduced design · seed 42</span>
+    <h1>Encoding Configuration Explorer</h1>
+    <p class="lede">Start from the default configuration (graph encoding, BoW, all text flags off, path length 0, text classifier) and change one step at a time. Each column is one configuration step; each point is the macro-F1 when every step up to that column takes the chosen value and every later step keeps its default.</p>
+  </header>
+
+  <nav class="tabs" id="tabs" role="tablist" aria-label="Dataset"></nav>
+
+  <section class="panel" aria-labelledby="h-explorer">
+    <h2 id="h-explorer">Sequential configuration transitions</h2>
+    <div class="controls" id="controls"></div>
+    <div class="toolbar">
+      <label><input type="checkbox" id="show-labels" checked> Show labels</label>
+      <label>Height <input type="range" id="height" min="420" max="1100" step="10" value="620"> <span id="height-v" class="mono">620</span></label>
+      <span><span class="legend-dot"></span>default value</span>
+      <span class="note" id="plot-note"></span>
+    </div>
+    <div id="plot" role="img" aria-label="Transition plot of macro-F1 across configuration steps"></div>
+    <div class="summary" id="summary"></div>
+    <p class="fine" id="explain"></p>
+  </section>
+
+  <section class="panel" aria-labelledby="h-top5">
+    <h2 id="h-top5">Top five configurations</h2>
+    <div class="scroll"><table id="top5"></table></div>
+    <p class="fine">“n/a” marks a text flag that is not part of this dataset’s design, or one that cannot change the input at that depth (edge and neighbour flags at d = 0, and at d = 1 for tree + text classifier). Single training seed; seed replicates for the top ten are still to run.</p>
+  </section>
+
+  <section class="panel" aria-labelledby="h-factors">
+    <h2 id="h-factors">Which factors move F1</h2>
+    <div class="charts">
+      <div class="chart" id="corr-graph"></div>
+      <div class="chart" id="corr-tree"></div>
+      <div class="chart" id="eta-graph"></div>
+      <div class="chart" id="eta-tree"></div>
+    </div>
+    <p class="fine">Pearson r between each parameter state and macro-F1, and one-way η² per factor, computed separately for graph and tree encoding. Training-setup states (Text / SAGE / GCN / GAT) come from the slice where every available text flag is on, the only text config run with all four setups. Encoder, path length and flags come from the core design (text classifier + SAGE, every text config); a flag counts only where it can change the input. Tree + text classifier at d = 0 reuses the graph runs, whose input is identical.</p>
+  </section>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/plotly.js/2.34.0/plotly.min.js"></script>
+<script>
+const DATA = /*__DATA__*/null;
+const PENDING = /*__PENDING__*/{};
+
+const ENC = [["bow","BoW"],["tfidf","TF-IDF"],["w2v","W2V"],["bert-encoder","BERT"]];
+const SETUPS = ["Text Cls","GNN Cls: SAGE","GNN Cls: GCN","GNN Cls: GAT"];
+const STAGE_TITLES = ["Structural Encoding","Text Encoding","Text Configuration","Bag of Paths","Training Setup"];
+const DATASET_ORDER = ["ea_type","ea_layer","modelset_abstract"];
+const DATASET_NAMES = {ea_type:"EA Type", ea_layer:"EA Layer", modelset_abstract:"Modelset Abstract"};
+
+const state = { ds: null, sel: null };
+let lookup = new Map();
+
+function css(name) { return getComputedStyle(document.documentElement).getPropertyValue(name).trim(); }
+function store(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
+function recall(k) { try { return JSON.parse(localStorage.getItem(k)); } catch (e) { return null; } }
+
+function flagLabel(ds, bits) { return ds.flag_short.map((s, i) => s + bits[i]).join("-"); }
+function allFlagCombos(n) {
+  const out = [];
+  for (let m = 0; m < (1 << n); m++) out.push(Array.from({length: n}, (_, i) => (m >> (n - 1 - i)) & 1));
+  return out;
+}
+function stagesFor(ds) {
+  return [
+    {key:"s", values:[["graph","Graph"],["tree","Tree"]], def:"graph"},
+    {key:"e", values:ENC, def:"bow"},
+    {key:"f", values:allFlagCombos(ds.flags.length).map(b => [b.join(""), flagLabel(ds, b)]), def:"0".repeat(ds.flags.length)},
+    {key:"d", values:[0,1,2,3].map(d => [String(d), String(d)]), def:"0"},
+    {key:"t", values:SETUPS.map(s => [s, s]), def:"Text Cls"},
+  ];
+}
+
+// Map a requested configuration to the run that has its input.
+function canonical(ds, cfg) {
+  const text = cfg.t === "Text Cls";
+  let s = cfg.s;
+  const d = +cfg.d;
+  if (s === "tree" && text && d === 0) s = "graph";            // identical input, not run separately
+  const minDepth = (cfg.s === "tree" && text) ? 2 : 1;
+  const f = ds.flags.map((name, i) => (name === "use_attributes" || d >= minDepth) ? +cfg.f[i] : null);
+  return { key: [s, cfg.e, d, cfg.t, f.join(",")].join("|"), reused: s !== cfg.s };
+}
+function buildLookup(ds) {
+  lookup = new Map();
+  for (const r of ds.runs) lookup.set([r.s, r.e, r.d, r.t, r.f.map(v => v === null ? "" : v).join(",")].join("|"), r);
+}
+function find(ds, cfg) {
+  const c = canonical(ds, cfg);
+  const key = c.key.replace(/null/g, "");
+  return { run: lookup.get(key) || null, reused: c.reused };
+}
+
+function describe(ds, cfg) {
+  const enc = Object.fromEntries(ENC)[cfg.e];
+  return `${cfg.s === "tree" ? "Tree" : "Graph"} · ${enc} · ${flagLabel(ds, cfg.f.split(""))} · d=${cfg.d} · ${cfg.t}`;
+}
+
+function initSelection(ds) {
+  const saved = recall("explorer-sel-" + state.ds);
+  const st = stagesFor(ds);
+  if (saved && saved.length === st.length && saved.every((v, i) => Array.isArray(v) && v.every(x => st[i].values.some(p => p[0] === x)) && v.length)) return saved;
+  return [["graph","tree"], ENC.map(e => e[0]), [st[2].def], ["1"], ["Text Cls","GNN Cls: SAGE"]];
+}
+
+function renderTabs() {
+  const nav = document.getElementById("tabs");
+  nav.innerHTML = "";
+  for (const k of DATASET_ORDER) {
+    const has = DATA[k];
+    const b = document.createElement("button");
+    b.className = "tab"; b.id = "tab-" + k; b.setAttribute("role", "tab");
+    b.setAttribute("aria-selected", String(k === state.ds));
+    b.innerHTML = `${DATASET_NAMES[k]}<span class="meta">${has ? DATA[k].classes + " classes" : (PENDING[k] || "running")}</span>`;
+    if (has) b.onclick = () => { state.ds = k; store("explorer-ds", k); renderAll(); };
+    else { b.disabled = true; b.title = "Results for this dataset are not in the explorer yet"; b.style.opacity = "0.6"; b.style.cursor = "default"; }
+    nav.appendChild(b);
+  }
+}
+
+function renderControls(ds) {
+  const st = stagesFor(ds);
+  const box = document.getElementById("controls");
+  box.innerHTML = "";
+  st.forEach((stage, i) => {
+    const wrap = document.createElement("div"); wrap.className = "ctrl";
+    const head = document.createElement("div"); head.className = "ctrl-head";
+    const title = i === 2 ? `Text Config <span class="mono" style="text-transform:none;letter-spacing:0">(${ds.flag_short.join("·")})</span>` : ["Structure","Encoder","","Path Len","Training"][i];
+    head.innerHTML = `<span class="eyebrow">${title}</span>`;
+    const all = document.createElement("button"); all.type = "button";
+    const allOn = () => state.sel[i].length === stage.values.length;
+    all.textContent = allOn() ? "Default only" : "All";
+    all.onclick = () => { state.sel[i] = allOn() ? [stage.def] : stage.values.map(v => v[0]); changed(); };
+    head.appendChild(all);
+    const chips = document.createElement("div"); chips.className = "chips";
+    stage.values.forEach(([v, label]) => {
+      const c = document.createElement("button"); c.type = "button"; c.id = `chip-${i}-${v.replace(/\W/g, "_")}`;
+      c.className = "chip" + (v === stage.def ? " default" : "");
+      c.textContent = label; c.setAttribute("aria-pressed", String(state.sel[i].includes(v)));
+      if (i === 2) c.title = ds.flag_names.map((n, j) => `${n}: ${v[j] === "1" ? "on" : "off"}`).join("\n");
+      c.onclick = () => {
+        const cur = state.sel[i];
+        if (cur.includes(v)) { if (cur.length > 1) state.sel[i] = cur.filter(x => x !== v); }
+        else state.sel[i] = stage.values.map(p => p[0]).filter(x => cur.includes(x) || x === v);
+        changed();
+      };
+      chips.appendChild(c);
+    });
+    wrap.append(head, chips);
+    box.appendChild(wrap);
+  });
+}
+
+function changed() { store("explorer-sel-" + state.ds, state.sel); renderControls(DATA[state.ds]); renderPlot(); }
+
+function viridis(t) {
+  const stops = [[68,1,84],[72,40,120],[62,74,137],[49,104,142],[38,130,142],[31,158,137],[53,183,121],[110,206,88],[181,222,43],[253,231,37]];
+  t = Math.max(0, Math.min(1, t)); const x = t * (stops.length - 1); const i = Math.min(stops.length - 2, Math.floor(x)); const f = x - i;
+  const c = stops[i].map((v, k) => Math.round(v + (stops[i + 1][k] - v) * f)); return `rgb(${c.join(",")})`;
+}
+
+function renderPlot() {
+  const ds = DATA[state.ds];
+  const st = stagesFor(ds);
+  const defaults = st.map(s => s.def);
+  const labelOf = st.map(s => Object.fromEntries(s.values));
+  const nodes = [], edges = [];
+  let missing = 0, reusedCount = 0;
+  const missingLeaves = new Set();
+
+  function cfgFrom(prefix) {
+    const v = defaults.slice(); prefix.forEach((p, i) => v[i] = p);
+    return { s: v[0], e: v[1], f: v[2], d: v[3], t: v[4] };
+  }
+  function walk(prefix, parent) {
+    const k = prefix.length;
+    if (k === st.length) return;
+    for (const v of state.sel[k]) {
+      const p = prefix.concat([v]);
+      const cfg = cfgFrom(p);
+      const { run, reused } = find(ds, cfg);
+      if (!run) { missing++; missingLeaves.add(describe(ds, cfg)); continue; }
+      if (reused) reusedCount++;
+      const idx = st[k].values.findIndex(x => x[0] === v);
+      const n = st[k].values.length;
+      const node = { x: k + (n > 1 ? (idx - (n - 1) / 2) * (0.34 / Math.max(n - 1, 1)) : 0), y: run.f1, k, v,
+        label: k === 3 ? "d=" + v : k === 4 ? v.replace("GNN Cls: ", "") : labelOf[k][v], cfg, run, reused, parent, isDefault: v === st[k].def };
+      nodes.push(node);
+      if (parent) edges.push([parent, node]);
+      walk(p, node);
+    }
+  }
+  walk([], null);
+
+  const ink = css("--ink"), ink2 = css("--ink-2"), muted = css("--muted"), grid = css("--grid"), edgeC = css("--edge"), surface = css("--surface"), accent = css("--accent");
+  const f1s = nodes.map(n => n.y);
+  const lo = Math.min(...f1s), hi = Math.max(...f1s);
+  const ex = [], ey = [];
+  for (const [a, b] of edges) { ex.push(a.x, b.x, null); ey.push(a.y, b.y, null); }
+  const showLabels = document.getElementById("show-labels").checked;
+
+  // Labels: only one label per (column, value, rounded F1) so stacked identical points don't overprint.
+  const seen = new Set();
+  const text = nodes.map(n => { const key = `${n.k}|${n.v}|${n.y.toFixed(3)}`; if (seen.has(key)) return ""; seen.add(key); return n.label; });
+
+  const hover = nodes.map(n => {
+    const delta = n.parent ? n.y - n.parent.y : null;
+    return `<b>${STAGE_TITLES[n.k]}: ${n.label}</b><br>F1 ${n.y.toFixed(4)}` + (delta !== null ? `  (${delta >= 0 ? "+" : "−"}${Math.abs(delta).toFixed(4)} vs previous step)` : "") +
+      `<br>Accuracy ${n.run.acc.toFixed(4)} · P ${n.run.p.toFixed(4)} · R ${n.run.r.toFixed(4)}` +
+      `<br><span style="font-size:11px">${describe(ds, n.cfg)}</span>` +
+      (n.reused ? `<br><span style="font-size:11px">tree + text at d=0 has the same input as graph; graph run shown</span>` : "");
+  });
+
+  const def = find(ds, {s: defaults[0], e: defaults[1], f: defaults[2], d: defaults[3], t: defaults[4]}).run;
+  const traces = [
+    { x: ex, y: ey, mode: "lines", type: "scatter", line: { color: edgeC, width: 1.2 }, hoverinfo: "skip", showlegend: false },
+    { x: nodes.map(n => n.x), y: f1s, mode: showLabels ? "markers+text" : "markers", type: "scatter",
+      text, textposition: "top center", textfont: { family: "IBM Plex Mono, monospace", size: 11, color: ink2 },
+      hovertext: hover, hoverinfo: "text", hoverlabel: { bgcolor: surface, bordercolor: css("--line"), font: { color: ink, family: "IBM Plex Sans, sans-serif", size: 12 } },
+      marker: { size: nodes.map(n => n.isDefault ? 11 : 9), color: f1s, colorscale: "Viridis", cmin: Math.min(lo, def ? def.f1 : lo), cmax: hi,
+        line: { color: nodes.map(n => n.isDefault ? accent : surface), width: nodes.map(n => n.isDefault ? 2 : 1.5) },
+        colorbar: { title: { text: "F1", font: { color: ink2, size: 12 } }, tickfont: { color: ink2, size: 11 }, thickness: 12, outlinewidth: 0, len: 0.9 } },
+      showlegend: false },
+  ];
+  const height = +document.getElementById("height").value;
+  const shapes = [];
+  for (let k = 0; k < st.length - 1; k++) shapes.push({ type: "line", xref: "x", yref: "paper", x0: k + 0.5, x1: k + 0.5, y0: 0, y1: 1, line: { color: grid, width: 1, dash: "dash" } });
+  if (def) shapes.push({ type: "line", xref: "paper", yref: "y", x0: 0, x1: 1, y0: def.f1, y1: def.f1, line: { color: accent, width: 1, dash: "dot" } });
+  const annotations = st.map((s, k) => ({ x: k, y: 0, xref: "x", yref: "paper", yshift: -34, showarrow: false,
+    text: `Default: ${k === 3 ? "d = " + s.def : labelOf[k][s.def]}`, font: { size: 11, color: muted, family: "IBM Plex Sans, sans-serif" } }));
+  const layout = {
+    height, margin: { l: 60, r: 20, t: 16, b: 84 }, paper_bgcolor: "rgba(0,0,0,0)", plot_bgcolor: "rgba(0,0,0,0)",
+    font: { family: "IBM Plex Sans, sans-serif", color: ink2, size: 12 },
+    xaxis: { tickmode: "array", tickvals: [0,1,2,3,4], ticktext: STAGE_TITLES, range: [-0.5, 4.5], showgrid: false, zeroline: false, tickfont: { size: 12, color: ink }, fixedrange: true },
+    yaxis: { title: { text: "Macro-F1", font: { size: 12 } }, gridcolor: grid, zeroline: false, range: [Math.max(0, Math.min(lo, def ? def.f1 : lo) - 0.04), Math.min(1, hi + 0.05)], tickformat: ".2f" },
+    shapes, annotations, hovermode: "closest",
+  };
+  Plotly.react("plot", traces, layout, { displayModeBar: false, responsive: true });
+
+  // Summary
+  const leaves = nodes.filter(n => n.k === st.length - 1).sort((a, b) => b.y - a.y);
+  const best = leaves[0], worst = leaves[leaves.length - 1];
+  const sum = document.getElementById("summary");
+  sum.innerHTML = "";
+  const stat = (v, k) => { const d = document.createElement("div"); d.className = "stat"; d.innerHTML = `<span class="v">${v}</span><span class="k">${k}</span>`; sum.appendChild(d); };
+  if (def) stat(def.f1.toFixed(4), "Default configuration");
+  if (best) stat(best.y.toFixed(4) + `<span class="mono" style="font-size:0.85rem;color:var(--pos)"> ${best.y - def.f1 >= 0 ? "+" : "−"}${Math.abs(best.y - def.f1).toFixed(4)}</span>`, "Best in selection · " + describe(ds, best.cfg));
+  if (worst && leaves.length > 1) stat(worst.y.toFixed(4), "Worst in selection · " + describe(ds, worst.cfg));
+  stat(String(leaves.length), "Complete configurations shown");
+
+  document.getElementById("plot-note").textContent = missing ? `${missing} not run in reduced design` : "";
+  const exp = [];
+  if (missing) exp.push(`${missing} selected configuration${missing > 1 ? "s were" : " was"} not run: GCN and GAT were run only with every available text flag on (${flagLabel(ds, Array(ds.flags.length).fill(1))}, or n/a at depths where flags have no effect).`);
+  if (reusedCount) exp.push("Tree + text classifier at d = 0 shows the graph run, because the two inputs are identical.");
+  exp.push(`Flags: ${ds.flag_short.map((s, i) => `${s} = ${ds.flag_names[i].replace("Use ", "").toLowerCase()}`).join(", ")}. Edge and neighbour flags only take effect from d = 1 (d = 2 for tree + text classifier), so earlier columns can sit level.`);
+  document.getElementById("explain").textContent = exp.join(" ");
+}
+
+function renderTop5(ds) {
+  const t = document.getElementById("top5");
+  const cols = ["Encoder","Cls.","Tree","d","Attr.","EType","ELabel","NType","GNN","Accuracy","Precision_M","Recall_M","F1_M"];
+  const head = ["Encoder","Cls.","Tree","d","Attr.","EType","ELabel","NType","GNN","Accuracy","Precision<sub>M</sub>","Recall<sub>M</sub>","F1<sub>M</sub>"];
+  const num = new Set(["d","Accuracy","Precision_M","Recall_M","F1_M"]);
+  t.innerHTML = "<thead><tr>" + head.map((h, i) => `<th class="${num.has(cols[i]) ? "num" : ""}">${h}</th>`).join("") + "</tr></thead><tbody>" +
+    ds.top5.map((r, i) => `<tr class="${i === 0 ? "best" : ""}">` + cols.map(c => {
+      const v = r[c]; const isNum = num.has(c);
+      const s = typeof v === "number" && c !== "d" ? v.toFixed(4) : String(v);
+      return `<td class="${isNum ? "num" : ""}${s === "n/a" ? " na" : ""}">${s}</td>`;
+    }).join("") + "</tr>").join("") + "</tbody>";
+}
+
+const STATE_ORDER = ["Classification: Text","GNN: SAGE","GNN: GCN","GNN: GAT","Encoder: BoW","Encoder: TFIDF","Encoder: Word2vec","Encoder: BERT","Path Length","Use Attributes","Use Edge Label","Use Edge Type","Use Node Type"];
+const FACTOR_ORDER = ["Text Encoder","Training Setup","Classification Type","Bag of Paths","Use Attributes","Use Edge Label","Use Edge Type","Use Node Type"];
+
+function renderFactors(ds) {
+  const ink = css("--ink"), ink2 = css("--ink-2"), grid = css("--grid"), surface = css("--surface");
+  const rng = {};
+  for (const kind of ["pearson","eta2"]) {
+    const vals = ds.stats.filter(s => s.kind === kind && s.value !== null).map(s => s.value);
+    rng[kind] = kind === "pearson" ? [Math.min(0, ...vals) * 1.12, Math.max(0, ...vals) * 1.12] : [0, Math.max(...vals) * 1.12];
+  }
+  for (const [kind, order, prefix, title] of [["pearson", STATE_ORDER, "corr", "Pearson r with F1"], ["eta2", FACTOR_ORDER, "eta", "η² per factor"]]) {
+    for (const struct of ["graph","tree"]) {
+      const rows = ds.stats.filter(s => s.kind === kind && s.structure === struct && s.value !== null)
+        .sort((a, b) => order.indexOf(a.name) - order.indexOf(b.name));
+      const colors = rows.map(r => kind === "pearson" ? (r.value >= 0 ? css("--pos") : css("--neg")) : css("--bar"));
+      Plotly.react(`${prefix}-${struct}`, [{
+        type: "bar", x: rows.map(r => r.name), y: rows.map(r => r.value), marker: { color: colors, line: { color: surface, width: 1 } },
+        customdata: rows.map(r => `${r.subset}, ${r.n_runs} runs`),
+        hovertemplate: "%{x}<br>%{y:.3f}<br><span style='font-size:11px'>%{customdata}</span><extra></extra>",
+        hoverlabel: { bgcolor: surface, font: { color: ink, family: "IBM Plex Sans, sans-serif" } },
+      }], {
+        title: { text: `${title} · ${struct === "graph" ? "Graph" : "Tree"} encoding`, font: { family: "Space Grotesk, sans-serif", size: 14, color: ink }, x: 0, xanchor: "left" },
+        height: 400, margin: { l: 70, r: 10, t: 40, b: 10 }, paper_bgcolor: "rgba(0,0,0,0)", plot_bgcolor: "rgba(0,0,0,0)",
+        font: { family: "IBM Plex Sans, sans-serif", color: ink2, size: 11 }, bargap: 0.35,
+        xaxis: { tickangle: -40, fixedrange: true, tickfont: { size: 10.5 }, automargin: true },
+        yaxis: { range: rng[kind], gridcolor: grid, zeroline: kind === "pearson", zerolinecolor: ink2, fixedrange: true, tickformat: ".1f" },
+      }, { displayModeBar: false, responsive: true });
+    }
+  }
+}
+
+function renderAll() {
+  renderTabs();
+  const ds = DATA[state.ds];
+  buildLookup(ds);
+  state.sel = initSelection(ds);
+  renderControls(ds);
+  renderPlot();
+  renderTop5(ds);
+  renderFactors(ds);
+}
+
+(function start() {
+  const savedDs = recall("explorer-ds");
+  state.ds = (savedDs && DATA[savedDs]) ? savedDs : DATASET_ORDER.find(k => DATA[k]);
+  document.getElementById("show-labels").onchange = renderPlot;
+  const h = document.getElementById("height");
+  h.oninput = () => { document.getElementById("height-v").textContent = h.value; renderPlot(); };
+  const rerender = () => { renderPlot(); renderFactors(DATA[state.ds]); };
+  try { matchMedia("(prefers-color-scheme: dark)").addEventListener("change", rerender); } catch (e) {}
+  new MutationObserver(rerender).observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
+  renderAll();
+})();
+</script>

@@ -1,0 +1,11 @@
+{
+  "dataset": "eamodelset",
+  "target": "type",
+  "design": "reduced",
+  "shard": null,
+  "grid": 256,
+  "ran": 16,
+  "ok": 16,
+  "failed": 0,
+  "output": "results_v2/node_cls_grid_eamodelset_type.jsonl"
+}

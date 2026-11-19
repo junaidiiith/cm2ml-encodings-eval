@@ -1,0 +1,11 @@
+{
+  "dataset": "modelset",
+  "target": "abstract",
+  "design": "reduced",
+  "shard": "1/4",
+  "grid": 105,
+  "ran": 105,
+  "ok": 105,
+  "failed": 0,
+  "output": "results_v2/node_cls_grid_modelset_abstract_shard1of4.jsonl"
+}

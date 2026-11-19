@@ -37,8 +37,12 @@ TASKS = [("eamodelset", "type"), ("eamodelset", "layer"), ("modelset", "abstract
 OLD_D0_BOW_F1 = {  # from all_results/*.jsonl, text mode, graph, d=0, bow
     ("eamodelset", "type", False): 0.4226573089202567,
     ("eamodelset", "layer", False): 0.6145335372683735,
-    ("modelset", "abstract", False): 0.6737748357715714,
-    ("modelset", "abstract", True): 0.6722045720847556,
+    # ModelSet values are from the 2026-11-19 grid after the label fix in
+    # lang2graph/ecore.py (abstract = declared EClass@abstract only). With the old,
+    # corrupted labels (every supertype marked abstract) they were 0.6737748357715714
+    # (attrs=False) and 0.6722045720847556 (attrs=True).
+    ("modelset", "abstract", False): 0.6178561211649628,
+    ("modelset", "abstract", True): 0.6236258601447486,
 }
 
 failures = []
