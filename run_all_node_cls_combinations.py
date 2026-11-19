@@ -57,6 +57,10 @@ if __name__ == "__main__":
     import os as _os
     for _var in ("OMP_NUM_THREADS", "MKL_NUM_THREADS", "OPENBLAS_NUM_THREADS", "NUMEXPR_NUM_THREADS"):
         _os.environ.setdefault(_var, str(_known.torch_threads))
+    # Graphs of very different sizes fragment PyTorch's CUDA cache: EA tree runs
+    # allocate <= 5.2 GB but the cache grew to 22.5 GB. Expandable segments avoid
+    # that; main() also caps the process at --gpu-mem-mb (see gpu_select rule).
+    _os.environ.setdefault("PYTORCH_CUDA_ALLOC_CONF", "expandable_segments:True")
     if not _known.dry_run:
         try:
             _GPU_INDEX = configure_gpu(_known.gpu_mem_mb, parse_device_list(_known.cuda_devices))
@@ -363,6 +367,11 @@ def main(argv=None) -> None:
         grid = [c for c in grid if base_signature(c) in wanted]
     grid = [c for c in grid if in_shard(c, args.shard)]
     torch.set_num_threads(args.torch_threads)
+    if torch.cuda.is_available():
+        total_mb = torch.cuda.get_device_properties(0).total_memory / 2**20
+        # Hard cap at the declared need: the allocator frees its cache before it
+        # would exceed this, so the job never holds more than it declared.
+        torch.cuda.set_per_process_memory_fraction(min(1.0, args.gpu_mem_mb / total_mb))
     print(f"Fields present: {fields}")
     print(f"Design: {args.design}  shard: {args.shard or 'all'}  threads: {args.torch_threads}")
     print(f"Grid size: {len(grid)} runs")
@@ -420,10 +429,12 @@ def main(argv=None) -> None:
             record["traceback"] = traceback.format_exc()
             failed += 1
         record["seconds"] = round(time.time() - start, 2)
+        record["gpu_mem_cap_mb"] = args.gpu_mem_mb if torch.cuda.is_available() else None
         record["gpu_index"] = gpu_index
         if torch.cuda.is_available():
             record["gpu_peak_allocated_mb"] = round(torch.cuda.max_memory_allocated() / 2**20)
             record["gpu_peak_reserved_mb"] = round(torch.cuda.max_memory_reserved() / 2**20)
+            torch.cuda.empty_cache()
         with out_path.open("a", encoding="utf-8") as f:
             f.write(json.dumps(record) + "\n")
         print(f"    -> {record['status']} in {record['seconds']}s "
