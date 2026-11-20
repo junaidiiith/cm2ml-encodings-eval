@@ -1,0 +1,11 @@
+{
+  "dataset": "eamodelset",
+  "target": "layer",
+  "design": "reduced",
+  "shard": null,
+  "grid": 256,
+  "ran": 256,
+  "ok": 256,
+  "failed": 0,
+  "output": "results/node_cls_grid_eamodelset_layer.jsonl"
+}

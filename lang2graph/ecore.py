@@ -121,7 +121,9 @@ def get_connections(nodes):
                     'target': super_type,
                     'type': SUPERTYPE,
                 })
-                nodes[super_type]['abstract'] = True
+                # Do not mark supertypes as abstract: the label must be the
+                # declared EClass@abstract flag only (having a subclass does not
+                # make a class abstract).
 
         for feature in classifier_info['structural_features']:
             ref = feature['ref']
@@ -135,10 +137,7 @@ def get_connections(nodes):
     
     for node in nodes:
         abstract = nodes[node].get('abstract', '')
-        if abstract:
-            nodes[node]['abstract'] = True
-        else:
-            nodes[node]['abstract'] = False
+        nodes[node]['abstract'] = str(abstract).strip().lower() == 'true'
 
     return links
 

@@ -1,0 +1,6 @@
+factor,eta2_on_delta,pairs_used,n_pairs
+path_depth,0.17039380589601902,text + SAGE pairs,100
+Use Node Type,0.13644721635547324,text + SAGE pairs,80
+encoder,0.09259634583141461,text + SAGE pairs,100
+setup,0.0333030901175507,all pairs,132
+Use Edge Type,0.002607071322028383,text + SAGE pairs,80

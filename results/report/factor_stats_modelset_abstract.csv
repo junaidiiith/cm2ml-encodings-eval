@@ -1,0 +1,39 @@
+structure,kind,name,value,subset,n_runs
+graph,pearson,Classification: Text,-0.027329209256758205,slice,64
+graph,pearson,GNN: SAGE,0.47050981070497516,slice,64
+graph,pearson,GNN: GCN,-0.1965222678400045,slice,64
+graph,pearson,GNN: GAT,-0.24665833360821235,slice,64
+graph,eta2,Training Setup,0.24119077720769225,slice,64
+graph,eta2,Classification Type,0.0007468856785997175,slice,64
+graph,pearson,Encoder: BoW,0.2423310024823994,core,208
+graph,pearson,Encoder: TFIDF,-0.1873171314288718,core,208
+graph,pearson,Encoder: Word2vec,-0.0226115502895184,core,208
+graph,pearson,Encoder: BERT,-0.032402320764009236,core,208
+graph,pearson,Path Length,-0.05357258143295793,core,208
+graph,eta2,Text Encoder,0.0715299113161919,core,208
+graph,eta2,Bag of Paths,0.22156763147965575,core,208
+graph,pearson,Use Attributes,-0.05544309619218641,"core, flag applicable",208
+graph,eta2,Use Attributes,0.003073936915376005,"core, flag applicable",208
+graph,pearson,Use Edge Label,0.03762671918290664,"core, flag applicable",192
+graph,eta2,Use Edge Label,0.0014157699964692254,"core, flag applicable",192
+graph,pearson,Use Edge Type,0.2699447817207101,"core, flag applicable",192
+graph,eta2,Use Edge Type,0.07287018517824141,"core, flag applicable",192
+tree,pearson,Classification: Text,-0.22248978799908808,slice,64
+tree,pearson,GNN: SAGE,0.13487596374316935,slice,64
+tree,pearson,GNN: GCN,-0.02382761394786748,slice,64
+tree,pearson,GNN: GAT,0.11144143820378619,slice,64
+tree,eta2,Training Setup,0.060510135521178655,slice,64
+tree,eta2,Classification Type,0.049501705763879265,slice,64
+tree,pearson,Encoder: BoW,0.5128133422145669,core,184
+tree,pearson,Encoder: TFIDF,0.21192400649447277,core,184
+tree,pearson,Encoder: Word2vec,-0.16471492258012116,core,184
+tree,pearson,Encoder: BERT,-0.5600224261289184,core,184
+tree,pearson,Path Length,0.08522151265483142,core,184
+tree,eta2,Text Encoder,0.48648407397737914,core,184
+tree,eta2,Bag of Paths,0.03872920967898546,core,184
+tree,pearson,Use Attributes,-0.03627129384230257,"core, flag applicable",184
+tree,eta2,Use Attributes,0.0013156067569946655,"core, flag applicable",184
+tree,pearson,Use Edge Label,-0.01754060061827075,"core, flag applicable",160
+tree,eta2,Use Edge Label,0.0003076726700496733,"core, flag applicable",160
+tree,pearson,Use Edge Type,0.07455754094243361,"core, flag applicable",160
+tree,eta2,Use Edge Type,0.0055588269113826605,"core, flag applicable",160

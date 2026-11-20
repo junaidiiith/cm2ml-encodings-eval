@@ -9,8 +9,6 @@ import torch.nn.functional as F
 from sklearn.linear_model import LogisticRegression
 from sklearn.svm import LinearSVC
 
-from transformers import AutoTokenizer
-from transformers import AutoModelForSequenceClassification
 
 
 class ClassicTextClassifier:
@@ -28,83 +26,6 @@ class ClassicTextClassifier:
 
     def predict(self, x):
         return self.model.predict(x)
-
-
-class _HFTextDataset(torch.utils.data.Dataset):
-    def __init__(self, tokenizer, texts, y, max_length: int) -> None:
-        self.enc = tokenizer(
-            texts,
-            truncation=True,
-            padding=True,
-            max_length=max_length,
-            return_tensors="pt",
-        )
-        self.labels = torch.tensor(y, dtype=torch.long)
-
-    def __len__(self):
-        return len(self.labels)
-
-    def __getitem__(self, idx):
-        item = {k: v[idx] for k, v in self.enc.items()}
-        item["labels"] = self.labels[idx]
-        return item
-
-
-class BertTextClassifier:
-    def __init__(
-        self,
-        model_name: str = "bert-base-uncased",
-        batch_size: int = 8,
-        epochs: int = 3,
-        learning_rate: float = 2e-5,
-        max_length: int = 256,
-        weight_decay: float = 0.01,
-    ):
-
-        self.batch_size = batch_size
-        self.epochs = epochs
-        self.learning_rate = learning_rate
-        self.max_length = max_length
-        self.weight_decay = weight_decay
-
-        self.tokenizer = AutoTokenizer.from_pretrained(model_name)
-        self.model_name = model_name
-        self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-        self.model = None
-
-    def fit(self, train_texts, train_y, num_classes: int) -> None:
-        
-
-        self.model = AutoModelForSequenceClassification.from_pretrained(self.model_name, num_labels=num_classes).to(self.device)
-        ds = _HFTextDataset(self.tokenizer, train_texts, train_y, self.max_length)
-        loader = torch.utils.data.DataLoader(ds, batch_size=self.batch_size, shuffle=True)
-        opt = torch.optim.AdamW(self.model.parameters(), lr=self.learning_rate, weight_decay=self.weight_decay)
-
-        self.model.train()
-        for _ in range(self.epochs):
-            for batch in loader:
-                batch = {k: v.to(self.device) for k, v in batch.items()}
-                out = self.model(**batch)
-                loss = out.loss
-                opt.zero_grad()
-                loss.backward()
-                opt.step()
-
-    def predict(self, texts):
-        if self.model is None:
-            raise RuntimeError("BertTextClassifier must be fitted before predict.")
-        
-        ds = _HFTextDataset(self.tokenizer, texts, np.zeros(len(texts), dtype=np.int64), self.max_length)
-        loader = torch.utils.data.DataLoader(ds, batch_size=self.batch_size, shuffle=False)
-        
-        self.model.eval()
-        preds = []
-        with torch.no_grad():
-            for batch in loader:
-                batch = {k: v.to(self.device) for k, v in batch.items() if k != "labels"}
-                logits = self.model(**batch).logits
-                preds.extend(torch.argmax(logits, dim=1).detach().cpu().tolist())
-        return np.asarray(preds, dtype=np.int64)
 
 
 class NodeGNN(nn.Module):

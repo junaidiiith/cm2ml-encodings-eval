@@ -1,0 +1,35 @@
+structure,kind,name,value,subset,n_runs
+graph,pearson,Classification: Text,0.5148971435787127,slice,64
+graph,pearson,GNN: SAGE,0.19550477542710767,slice,64
+graph,pearson,GNN: GCN,-0.3842432244310076,slice,64
+graph,pearson,GNN: GAT,-0.3261586945748125,slice,64
+graph,eta2,Training Setup,0.41802265143615375,slice,64
+graph,eta2,Classification Type,0.2651190684655175,slice,64
+graph,pearson,Encoder: BoW,0.581128592828161,core,104
+graph,pearson,Encoder: TFIDF,-0.28175965384418056,core,104
+graph,pearson,Encoder: Word2vec,-0.1618391606008071,core,104
+graph,pearson,Encoder: BERT,-0.13752977838317368,core,104
+graph,pearson,Path Length,0.09561663517053388,core,104
+graph,eta2,Text Encoder,0.3466539733371979,core,104
+graph,eta2,Bag of Paths,0.1288308516288256,core,104
+graph,pearson,Use Edge Type,0.18005211110653205,"core, flag applicable",96
+graph,eta2,Use Edge Type,0.032418762713918865,"core, flag applicable",96
+graph,pearson,Use Node Type,0.2628882543595379,"core, flag applicable",96
+graph,eta2,Use Node Type,0.06911023428020534,"core, flag applicable",96
+tree,pearson,Classification: Text,0.5512116735209102,slice,64
+tree,pearson,GNN: SAGE,0.0505606069975823,slice,64
+tree,pearson,GNN: GCN,-0.3219668610469154,slice,64
+tree,pearson,GNN: GAT,-0.2798054194715771,slice,64
+tree,eta2,Training Setup,0.3662583122878162,slice,64
+tree,eta2,Classification Type,0.3038343090257221,slice,64
+tree,pearson,Encoder: BoW,0.4657397219863533,core,92
+tree,pearson,Encoder: TFIDF,-0.14338881044742605,core,92
+tree,pearson,Encoder: Word2vec,-0.05177045742574912,core,92
+tree,pearson,Encoder: BERT,-0.270580454113178,core,92
+tree,pearson,Path Length,0.24365449568049818,core,92
+tree,eta2,Text Encoder,0.23502585150571365,core,92
+tree,eta2,Bag of Paths,0.07419009404426165,core,92
+tree,pearson,Use Edge Type,0.20806939932765792,"core, flag applicable",80
+tree,eta2,Use Edge Type,0.04329287493657231,"core, flag applicable",80
+tree,pearson,Use Node Type,0.10005147619506083,"core, flag applicable",80
+tree,eta2,Use Node Type,0.01001029788881074,"core, flag applicable",80

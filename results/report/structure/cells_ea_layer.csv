@@ -1,0 +1,48 @@
+rows,cols,row,col,n_pairs,mean_delta,share_tree_better
+setup,path_depth,GNN Cls: GAT,0,4,0.00345629398101531,0.25
+setup,path_depth,GNN Cls: GAT,1,4,-0.11611764138395025,0.0
+setup,path_depth,GNN Cls: GAT,2,4,-0.12077361086628141,0.0
+setup,path_depth,GNN Cls: GAT,3,4,-0.10845422564599087,0.0
+setup,path_depth,GNN Cls: GCN,0,4,-0.043029608776488315,0.25
+setup,path_depth,GNN Cls: GCN,1,4,-0.12604882642606274,0.0
+setup,path_depth,GNN Cls: GCN,2,4,-0.10588874831683129,0.0
+setup,path_depth,GNN Cls: GCN,3,4,-0.09591741327820555,0.0
+setup,path_depth,GNN Cls: SAGE,0,4,-0.05243056229966449,0.25
+setup,path_depth,GNN Cls: SAGE,1,16,-0.11420279862876771,0.0
+setup,path_depth,GNN Cls: SAGE,2,16,-0.1254486731782175,0.0
+setup,path_depth,GNN Cls: SAGE,3,16,-0.11392953342309362,0.0
+setup,path_depth,Text Cls,1,16,-0.18416052679559103,0.0
+setup,path_depth,Text Cls,2,16,-0.09194949909251401,0.0
+setup,path_depth,Text Cls,3,16,-0.07882908226364077,0.0
+encoder,setup,BERT,GNN Cls: GAT,4,-0.15187302482688875,0.0
+encoder,setup,BERT,GNN Cls: GCN,4,-0.13689906734297502,0.0
+encoder,setup,BERT,GNN Cls: SAGE,13,-0.156403445251177,0.0
+encoder,setup,BERT,Text Cls,12,-0.13908917216772987,0.0
+encoder,setup,BoW,GNN Cls: GAT,4,-0.09163065301208298,0.0
+encoder,setup,BoW,GNN Cls: GCN,4,-0.09653443302116152,0.0
+encoder,setup,BoW,GNN Cls: SAGE,13,-0.12738104551769164,0.0
+encoder,setup,BoW,Text Cls,12,-0.08042835993406529,0.0
+encoder,setup,TF-IDF,GNN Cls: GAT,4,-0.07908596217005814,0.0
+encoder,setup,TF-IDF,GNN Cls: GCN,4,-0.10776323264734389,0.0
+encoder,setup,TF-IDF,GNN Cls: SAGE,13,-0.0900209410970832,0.0
+encoder,setup,TF-IDF,Text Cls,12,-0.12190975696653562,0.0
+encoder,setup,W2V,GNN Cls: GAT,4,-0.019299543906177344,0.25
+encoder,setup,W2V,GNN Cls: GCN,4,-0.029687863786107466,0.25
+encoder,setup,W2V,GNN Cls: SAGE,13,-0.07750367066327271,0.07692307692307693
+encoder,setup,W2V,Text Cls,12,-0.13182485513399697,0.0
+encoder,path_depth,BERT,0,3,-0.054354293434954015,0.0
+encoder,path_depth,BERT,1,10,-0.17012968008529814,0.0
+encoder,path_depth,BERT,2,10,-0.15106728178335732,0.0
+encoder,path_depth,BERT,3,10,-0.1482370723966098,0.0
+encoder,path_depth,BoW,0,3,-0.0723276663071245,0.0
+encoder,path_depth,BoW,1,10,-0.13539368779889743,0.0
+encoder,path_depth,BoW,2,10,-0.0991111293609548,0.0
+encoder,path_depth,BoW,3,10,-0.08117230845518571,0.0
+encoder,path_depth,TF-IDF,0,3,-0.07851383673486363,0.0
+encoder,path_depth,TF-IDF,1,10,-0.12940874055752374,0.0
+encoder,path_depth,TF-IDF,2,10,-0.09970079517522876,0.0
+encoder,path_depth,TF-IDF,3,10,-0.08539492295980015,0.0
+encoder,path_depth,W2V,0,3,0.08252396035009217,1.0
+encoder,path_depth,W2V,1,10,-0.13931579936125987,0.0
+encoder,path_depth,W2V,2,10,-0.08862281298687465,0.0
+encoder,path_depth,W2V,3,10,-0.07535813685685792,0.0

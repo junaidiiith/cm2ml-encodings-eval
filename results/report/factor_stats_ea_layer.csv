@@ -1,0 +1,35 @@
+structure,kind,name,value,subset,n_runs
+graph,pearson,Classification: Text,0.028493304290054863,slice,64
+graph,pearson,GNN: SAGE,0.1549952918101198,slice,64
+graph,pearson,GNN: GCN,-0.11199254084596508,slice,64
+graph,pearson,GNN: GAT,-0.07149605525420966,slice,64
+graph,eta2,Training Setup,0.031867067996038494,slice,64
+graph,eta2,Classification Type,0.0008118683893656617,slice,64
+graph,pearson,Encoder: BoW,0.37927439820691117,core,104
+graph,pearson,Encoder: TFIDF,0.20976226951140087,core,104
+graph,pearson,Encoder: Word2vec,-0.21599795344367875,core,104
+graph,pearson,Encoder: BERT,-0.37303871427463303,core,104
+graph,pearson,Path Length,0.2668167625132452,core,104
+graph,eta2,Text Encoder,0.2802467078139883,core,104
+graph,eta2,Bag of Paths,0.24063763459007292,core,104
+graph,pearson,Use Edge Type,0.1999563377140115,"core, flag applicable",96
+graph,eta2,Use Edge Type,0.03998253699199963,"core, flag applicable",96
+graph,pearson,Use Node Type,0.5059068375408473,"core, flag applicable",96
+graph,eta2,Use Node Type,0.25594172827058154,"core, flag applicable",96
+tree,pearson,Classification: Text,0.04205145234413032,slice,64
+tree,pearson,GNN: SAGE,0.045371076341297376,slice,64
+tree,pearson,GNN: GCN,-0.09031841196508608,slice,64
+tree,pearson,GNN: GAT,0.0028958832796583812,slice,64
+tree,eta2,Training Setup,0.00899449566936215,slice,64
+tree,eta2,Classification Type,0.0017683246442506497,slice,64
+tree,pearson,Encoder: BoW,0.4331493081022698,core,92
+tree,pearson,Encoder: TFIDF,0.2844293727321856,core,92
+tree,pearson,Encoder: Word2vec,-0.08185842874097976,core,92
+tree,pearson,Encoder: BERT,-0.6357202520934762,core,92
+tree,pearson,Path Length,0.24928058357109192,core,92
+tree,eta2,Text Encoder,0.5095195743450265,core,92
+tree,eta2,Bag of Paths,0.09345107062765055,core,92
+tree,pearson,Use Edge Type,0.1494303299908374,"core, flag applicable",80
+tree,eta2,Use Edge Type,0.02232942352117059,"core, flag applicable",80
+tree,pearson,Use Node Type,0.2451487999592419,"core, flag applicable",80
+tree,eta2,Use Node Type,0.06009793412145659,"core, flag applicable",80

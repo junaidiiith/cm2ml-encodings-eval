@@ -6,6 +6,10 @@ Package for evaluating node/edge classification on typed `networkx` graphs with:
 - A3: GNN training with encoded node/edge features
 - Tree serialization: `MODEL -> OBJ/ASSOC -> ATTS/...` then node classification on tree nodes
 
+## Results (CM2ML paper, Section 5)
+
+The node-classification results used in the paper are in [`results/`](results/). [`results/README.md`](results/README.md) documents the pipeline fixes, the experimental setup, the top configurations (Table 13), the factor analyses (Figures 11–14), the tree vs graph comparison, and how to reproduce them with `run_all_node_cls_combinations.py` and the scripts in [`analysis/`](analysis/).
+
 ## Install
 
 ```bash
@@ -116,7 +120,6 @@ res_tree_gnn = run_tree_gnn_node_classification(
 
 - `logreg`
 - `linearsvm`
-- `bert_classifier` (fine-tune `AutoModelForSequenceClassification`)
 
 ## Supported GNN Models
 

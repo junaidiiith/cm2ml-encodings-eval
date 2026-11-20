@@ -9,7 +9,6 @@ from .config import (
     SplitConfig,
     TextBuildConfig,
     TextExperimentConfig,
-    BertClassifierConfig,
     GNNExperimentConfig,
     TreeSerializationConfig,
 )
@@ -35,7 +34,6 @@ __all__ = [
     "SplitConfig",
     "TextBuildConfig",
     "TextExperimentConfig",
-    "BertClassifierConfig",
     "GNNExperimentConfig",
     "TreeSerializationConfig",
     "run_text_node_classification",

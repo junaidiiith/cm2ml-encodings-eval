@@ -37,14 +37,6 @@ text_experiment:
   encoder_name: tfidf
   classifier_name: logreg
 
-bert:
-  model_name: bert-base-uncased
-  batch_size: 8
-  epochs: 3
-  learning_rate: 2.0e-5
-  max_length: 256
-  weight_decay: 0.01
-
 gnn:
   model_name: gcn
   hidden_dim: 128
