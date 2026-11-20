@@ -1,7 +1,7 @@
 """Tables, factor-importance figures and explorer data for the node-classification grid.
 
-Reads results_v2/node_cls_grid_<dataset>_<target>*.jsonl (reduced design, see
-run_all_node_cls_combinations.py) and writes to results_v2/report/:
+Reads results/node_cls_grid_<dataset>_<target>*.jsonl (reduced design, see
+run_all_node_cls_combinations.py) and writes to results/report/:
 
   top5_<key>.csv, top10_<key>.csv     best configurations by macro-F1
   top5_table.tex                      Table-13-style LaTeX table (all datasets present)
@@ -23,7 +23,7 @@ Which runs each statistic uses (the reduced design is not a full factorial):
     graph + text classifier at d=0 (tests/verify_real_data.py, section B); those
     runs are reused in the tree panel so that panel is balanced.
 
-Usage: python analysis/node_cls_report.py [--results results_v2] [--out results_v2/report]
+Usage: python analysis/node_cls_report.py [--results results] [--out results/report]
 """
 
 from __future__ import annotations
@@ -353,8 +353,8 @@ def explorer_records(df: pd.DataFrame, flags: list[str]) -> list[dict]:
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--results", default="results_v2")
-    ap.add_argument("--out", default="results_v2/report")
+    ap.add_argument("--results", default="results")
+    ap.add_argument("--out", default="results/report")
     ap.add_argument("--datasets", nargs="+", default=list(DATASETS))
     ap.add_argument("--no-figures", action="store_true")
     args = ap.parse_args()

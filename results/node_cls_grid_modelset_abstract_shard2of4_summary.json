@@ -7,5 +7,5 @@
   "ran": 107,
   "ok": 107,
   "failed": 0,
-  "output": "results_v2/node_cls_grid_modelset_abstract_shard2of4.jsonl"
+  "output": "results/node_cls_grid_modelset_abstract_shard2of4.jsonl"
 }

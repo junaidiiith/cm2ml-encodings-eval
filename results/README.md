@@ -1,8 +1,8 @@
-# Node-classification re-run (results_v2)
+# Node-classification results
 
-This folder holds the corrected node-classification results for Section 5 (Quantitative Evaluation) of the CM2ML paper. They replace every number in Table 13 and Figures 11–14. This README covers what was wrong, what was run, the new results, and which paper claims hold or change, section by section.
+This folder holds the corrected node-classification results for Section 5 (Quantitative Evaluation) of the CM2ML paper. They replace the old results in `eval_artifacts/` and every number in Table 13 and Figures 11–14. This README covers what was wrong, what was run, the new results, and which paper claims hold or change, section by section.
 
-- Code: branch `fix/node-cls-pipeline`. The runs used commits `57418ee` and `3776f83`, plus the ModelSet label fix that is committed together with these results.
+- Code: merged into `main` from branch `fix/node-cls-pipeline`. The runs used commits `57418ee` and `3776f83`, plus the ModelSet label fix that is committed together with these results.
 - Runs: 960 configurations, 0 failures, one seed (42).
 - Date: 18–19 November 2026.
 
@@ -39,7 +39,7 @@ The old GNN and tree rows of Table 13, the old ModelSet numbers, and every facto
 
 All fixes are covered by `tests/test_bug_fixes.py` (unit tests), `tests/verify_real_data.py` (leak audit on real data, exact reproduction of the old d = 0 results) and `tests/check_grid_duplicates.py` (no two grid configs give identical inputs).
 
-The superseded ModelSet runs on the buggy labels are kept in [superseded_modelset_labelbug/](superseded_modelset_labelbug/) for reference only.
+The old results (`eval_artifacts/`), the run logs and the ModelSet runs on the buggy labels are no longer in the tree. They remain in git history at commit `89665ea` (`results_v2/logs/`, `results_v2/superseded_modelset_labelbug/`) and at `477a78e` (`eval_artifacts/`).
 
 ## 2. Experimental setup as run (text for Section 5.1)
 
@@ -369,8 +369,6 @@ python tests/check_grid_duplicates.py
 | `node_cls_grid_eamodelset_layer.jsonl` | 256 EA Layer runs. |
 | `node_cls_grid_modelset_abstract_shard{0..3}of4.jsonl` | 448 ModelSet runs on the corrected labels. |
 | `*_summary.json` | Per-job counts. The EA Type summary shows 16 because that job was resumed; the jsonl has all 256. |
-| `logs/*.log.gz` | Run logs, gzipped. Read them with `zcat`. |
-| `superseded_modelset_labelbug/` | Old ModelSet runs on the buggy labels. Do not use. |
 | `report/top5_table.tex` | Table 13 replacement. |
 | `report/top5_*.csv`, `report/top10_*.csv` | Top configurations per dataset. |
 | `report/factor_stats_*.csv` | Pearson and eta² values behind Figures 12–14. |

@@ -1,7 +1,7 @@
-"""Embed results_v2/report/explorer_data.json into the explorer page.
+"""Embed results/report/explorer_data.json into the explorer page.
 
-Usage: python analysis/build_explorer.py [--data results_v2/report/explorer_data.json]
-                                         [--out results_v2/report/explorer.html]
+Usage: python analysis/build_explorer.py [--data results/report/explorer_data.json]
+                                         [--out results/report/explorer.html]
                                          [--pending modelset_abstract="re-running"]
 """
 
@@ -14,8 +14,8 @@ HERE = Path(__file__).resolve().parent
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--data", default="results_v2/report/explorer_data.json")
-    ap.add_argument("--out", default="results_v2/report/explorer.html")
+    ap.add_argument("--data", default="results/report/explorer_data.json")
+    ap.add_argument("--out", default="results/report/explorer.html")
     ap.add_argument("--pending", nargs="*", default=[], help="key=label for datasets without results yet")
     args = ap.parse_args()
     data = Path(args.data).read_text()

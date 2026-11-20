@@ -7,5 +7,5 @@
   "ran": 256,
   "ok": 256,
   "failed": 0,
-  "output": "results_v2/node_cls_grid_eamodelset_layer.jsonl"
+  "output": "results/node_cls_grid_eamodelset_layer.jsonl"
 }

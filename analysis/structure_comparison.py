@@ -10,7 +10,7 @@ the run that was actually executed, exactly as in the explorer. Tree + text
 classifier at d=0 is excluded: its input is identical to graph by construction.
 GCN/GAT pairs exist only on the all-flags-on slice (reduced design).
 
-Outputs (results_v2/report/structure/):
+Outputs (results/report/structure/):
   pairs_<key>.csv          every matched pair
   conditional_<key>.csv    mean/median delta, share tree better, Wilcoxon p, per factor level
   cells_<key>.csv          delta per two-factor cell (setup x depth, encoder x setup)
@@ -33,7 +33,7 @@ from scipy.stats import wilcoxon
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import node_cls_report as R  # noqa: E402
 
-OUT = Path("results_v2/report/structure")
+OUT = Path("results/report/structure")
 
 
 def canonical_flags(flags, structure, setup, d, names):
@@ -81,7 +81,7 @@ def eta2(cats, vals):
 
 def analyse(key: str):
     name, ds, tg, _ = R.DATASETS[key]
-    df = R.load_runs("results_v2", ds, tg)
+    df = R.load_runs("results", ds, tg)
     names = R.dataset_flags(df)
     flag_cols = [R.FLAG_NAME[n] for n in names]
     pairs = make_pairs(df, names)

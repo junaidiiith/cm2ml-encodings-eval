@@ -334,7 +334,7 @@ def parse_args(argv=None):
     p.add_argument("--shard", default=None, help="i/N: run every N-th config (0-based i)")
     p.add_argument("--torch-threads", type=int, default=8)
 
-    p.add_argument("--out-dir", default="results_v2")
+    p.add_argument("--out-dir", default="results")
     p.add_argument("--limit", type=int, default=None, help="Run only the first N pending combinations")
     p.add_argument("--dry-run", action="store_true", help="Print the grid and exit")
     p.add_argument("--cuda_devices", default=None,

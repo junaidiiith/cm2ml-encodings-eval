@@ -7,5 +7,5 @@
   "ran": 16,
   "ok": 16,
   "failed": 0,
-  "output": "results_v2/node_cls_grid_eamodelset_type.jsonl"
+  "output": "results/node_cls_grid_eamodelset_type.jsonl"
 }
