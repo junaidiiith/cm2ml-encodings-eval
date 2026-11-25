@@ -1,0 +1,8 @@
+# Python
+__pycache__/
+*.egg-info/
+.pytest_cache/
+
+# Local data and outputs (see README: Data, Reproducing)
+datasets/
+out/

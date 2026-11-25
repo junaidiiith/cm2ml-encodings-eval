@@ -8,19 +8,25 @@ Package for evaluating node/edge classification on typed `networkx` graphs with:
 
 ## Results (CM2ML paper, Section 5)
 
-The node-classification results used in the paper are in [`results/`](results/). [`results/README.md`](results/README.md) documents the pipeline fixes, the experimental setup, the top configurations (Table 13), the factor analyses (Figures 11–14), the tree vs graph comparison, and how to reproduce them with `run_all_node_cls_combinations.py` and the scripts in [`analysis/`](analysis/).
+The node-classification results used in the paper are in [`results/`](results/). [`results/README.md`](results/README.md) documents the pipeline fixes, the experimental setup, the top configurations, the factor analyses, the tree vs graph comparison, and how to reproduce them with `run_all_node_cls_combinations.py` and the scripts in [`analysis/`](analysis/).
+
+This pipeline implements the encoding choices studied in the paper in Python (graph or tree structure, bag-of-paths context, and the text encoders listed below). It does not call the [CM2ML](https://github.com/borkdominik/CM2ML) framework itself.
 
 ## Install
 
-```bash
-pip install -e .
-```
-
-Optional Word2Vec support:
+Python 3.10 or later. The paper's grid uses W2V, so install the `word2vec` extra:
 
 ```bash
-pip install -e .[word2vec]
+pip install -e ".[word2vec]"
 ```
+
+To also run the analysis scripts (figures need `kaleido`) and the tests:
+
+```bash
+pip install -e ".[word2vec,analysis,test]"
+```
+
+Without an NVIDIA GPU, the scripts run on the CPU.
 
 ## Graph Assumptions
 
@@ -114,7 +120,7 @@ res_tree_gnn = run_tree_gnn_node_classification(
 - `word2vec` (requires `gensim`)
 - `custom_w2v` (loads `out/skip_gram_modelling/skip_gram_vectors.kv`)
 - `custom_w2v:/absolute/or/relative/path/to/model.kv`
-- `bert` (BERT CLS embeddings)
+- `bert` (frozen `bert-base-uncased`; the embedding of the `[CLS]` token)
 
 ## Supported Text Classifiers
 
@@ -127,25 +133,56 @@ res_tree_gnn = run_tree_gnn_node_classification(
 - `graphsage` / `sage`
 - `gat`
 
-## Reproducible Example
+## Data
 
-Run:
+The datasets are not part of this repository. Place them in `datasets/` (ignored by git):
+
+| Dataset | Source | Expected location |
+| --- | --- | --- |
+| EAModelSet (ArchiMate) | Glaser et al., PoEM 2023, [doi:10.1007/978-3-031-48583-1_2](https://doi.org/10.1007/978-3-031-48583-1_2) | `datasets/eamodelset/processed-models/<model id>/model.json` |
+| ModelSet (Ecore part) | López et al., SoSyM 2022, [doi:10.1007/s10270-021-00929-3](https://doi.org/10.1007/s10270-021-00929-3) | `datasets/modelset/ecore.jsonl` |
+
+On the first run, the loaders parse the models and cache them in `datasets/pickles/`.
+
+## Reproducing the Paper Results
+
+All commands run from the repository root. The full procedure, including the ModelSet cache, the sharded ModelSet run, and the checks, is in [`results/README.md`, section 10](results/README.md#10-reproducing).
 
 ```bash
-python3 examples/run_pipeline.py
-python3 examples/run_tree_pipeline.py
+# ModelSet cache with the declared abstract labels (once)
+python -c "from data_loading.models_dataset import get_models_dataset as g; \
+           g('modelset', min_enr=1.2, min_edges=10, reload=True, remove_duplicates=True)"
+
+# Grid (reduced design) for the three tasks; results go to results/ and resume automatically
+python run_all_node_cls_combinations.py --dataset eamodelset --target layer
+python run_all_node_cls_combinations.py --dataset eamodelset --target type
+python run_all_node_cls_combinations.py --dataset modelset --target abstract
+
+# Reports, figures, and the interactive explorer, from the jsonl files in results/
+python analysis/node_cls_report.py
+python analysis/structure_comparison.py
+python analysis/build_explorer.py
+python analysis/modelset_rule_baseline.py
 ```
+
+The first three analysis scripts need only the committed `results/*.jsonl` files; the rule baseline also needs the ModelSet data.
+
+To check the setup on a small sample before a full run, print the grid or run a few configurations into a separate folder:
+
+```bash
+python run_all_node_cls_combinations.py --dataset eamodelset --target layer --dry-run
+python run_all_node_cls_combinations.py --dataset eamodelset --target layer --max-graphs 20 --limit 4 --out-dir out/smoke
+```
+
+In the grid, the encoders are named `bow`, `tfidf`, `w2v` (Word2Vec trained on the corpus), and `bert-encoder` (the `bert` encoder above). `python run_all_node_cls_combinations.py --help` lists all options.
 
 ## YAML Runner
 
-Run multiple experiment configurations from YAML:
+Run individual experiment configurations from YAML (the schema is in [`configs/README.md`](configs/README.md)):
 
 ```bash
-python3 -m cm2ml_encodings_eval.yaml_runner --config configs/pipeline_text_gnn.yaml --output results/text_gnn.json
-python3 -m cm2ml_encodings_eval.yaml_runner --config configs/pipeline_tree.yaml --output results/tree.json
+python yaml_runner.py --config configs/pipeline_text_gnn.yaml --output out/text_gnn.json
+python yaml_runner.py --config configs/pipeline_tree.yaml --output out/tree.json
 ```
 
-YAML files in this repo:
-
-- `configs/pipeline_text_gnn.yaml`
-- `configs/pipeline_tree.yaml`
+Both example configs use ModelSet (see Data).

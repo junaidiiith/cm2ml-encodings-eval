@@ -15,7 +15,15 @@ setup(
         "torch-geometric>=2.5",
         "transformers>=4.39",
         "PyYAML>=6.0",
+        "pandas",
+        "tqdm",
+        "xmltodict",
+        "tensorboardX",
     ],
-    extras_require={"word2vec": ["gensim>=4.3"]},
+    extras_require={
+        "word2vec": ["gensim>=4.3"],
+        "analysis": ["plotly", "kaleido"],
+        "test": ["pytest"],
+    },
     python_requires=">=3.10",
 )

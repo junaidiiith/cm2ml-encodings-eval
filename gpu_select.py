@@ -10,6 +10,9 @@ device query, and ignores later changes. CUDA_DEVICE_ORDER is set to PCI_BUS_ID
 so the indices here match nvidia-smi.
 
 CLI (for shell scripts):  python gpu_select.py --need-mb 4000   -> prints an index
+
+On a machine without NVIDIA GPUs (no ``nvidia-smi``), ``configure_gpu`` returns None
+and the job runs on the CPU.
 """
 
 from __future__ import annotations
@@ -45,10 +48,14 @@ class GPU:
 
 
 def query_gpus() -> List[GPU]:
-    out = subprocess.check_output(
-        ["nvidia-smi", "--query-gpu=index,memory.total,memory.used,memory.free", "--format=csv,noheader,nounits"],
-        text=True,
-    )
+    """Return the NVIDIA GPUs of this machine, or an empty list if there are none."""
+    try:
+        out = subprocess.check_output(
+            ["nvidia-smi", "--query-gpu=index,memory.total,memory.used,memory.free", "--format=csv,noheader,nounits"],
+            text=True,
+        )
+    except (FileNotFoundError, subprocess.CalledProcessError):
+        return []
     gpus = []
     for line in out.strip().splitlines():
         idx, total, used, free = (int(x.strip()) for x in line.split(","))
@@ -71,10 +78,15 @@ def select_gpu(need_mb: int, requested: Optional[List[int]] = None, gpus: Option
     return max(ok, key=lambda g: g.free_mb).index
 
 
-def configure_gpu(need_mb: int = DEFAULT_NEED_MB, requested: Optional[List[int]] = None) -> int:
+def configure_gpu(need_mb: int = DEFAULT_NEED_MB, requested: Optional[List[int]] = None) -> Optional[int]:
+    """Select a GPU by the rule above. Returns None (CPU) on machines without NVIDIA GPUs."""
     if "torch" in sys.modules:
         raise RuntimeError("configure_gpu() must run before torch is imported, or CUDA_VISIBLE_DEVICES is ignored.")
-    idx = select_gpu(need_mb, requested)
+    gpus = query_gpus()
+    if not gpus and not requested:
+        print("[gpu_select] no NVIDIA GPU found, running on the CPU", flush=True)
+        return None
+    idx = select_gpu(need_mb, requested, gpus)
     os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
     os.environ["CUDA_VISIBLE_DEVICES"] = str(idx)
     print(f"[gpu_select] using GPU {idx} (need {need_mb} MiB, rule: free >= {HEADROOM_FACTOR:g}x need, "
